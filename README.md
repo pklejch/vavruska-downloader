@@ -13,6 +13,7 @@ password-for-course-3
 ```python
 python3 -m venv venv
 . venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 3. Run script
 ```

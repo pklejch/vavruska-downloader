@@ -1,6 +1,8 @@
 import requests
 import bs4
 import yt_dlp
+import multiprocessing
+import os
 
 VAVRUSKA_SYLABUS_URL = 'https://www.vavruska.info/video-sylabus/?action=login'
 PASSWORD_FILE = 'passwords'
@@ -30,7 +32,8 @@ class VavruskaDownloader:
         for password in self.passwords:
             youtube_links_to_download.extend(self._get_links(password))
 
-        self._download_video(youtube_links_to_download)
+        with multiprocessing.Pool(os.cpu_count()) as pool:
+            pool.map(self._download_videos, youtube_links_to_download)
 
     def _get_links(self, password: str) -> list[str]:
         session = requests.sessions.Session()
@@ -49,7 +52,7 @@ class VavruskaDownloader:
 
         return youtube_links_to_download
 
-    def _download_video(self, youtube_links: list[str]) -> None:
+    def _download_videos(self, youtube_links: list[str]) -> None:
         ydl_opts = {
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
             'outtmpl': f'{OUTPUT_FOLDER}/%(title)s.%(ext)s'
